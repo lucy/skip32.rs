@@ -2,12 +2,14 @@ language: rust
 sudo: false
 env:
   global:
-    - secure: jKc1KLfBffY2GxTsWnGZy28ZAEBDtHFkTPhcVCM9gDxFHBNwS+EoWvTG+DRf9fXgEYbl7H1QEH+x5a7MGM4SGkVYM4sqWCiZHef54n6qoocxE6WmHjxnOQ+nDJqqw+ZE3UY8ygBmZZKa29AC+OCbQumOTkZ36Nk4ytHGKe81klg=
+    secure: KrSphUaXPC4Q4hcdnwViMzYmgJ7o5cNRMT7cpzGdjvrnMyEzYyQCd/rynWbajQLywanaEe6iafq4dtQVmK0LSMXXRw4qLpp9NNTn2l1o8qz2QhDMy2gDxzZyOCI0aZJadcFcvpH2OgQ5ui76AVXAHln8IaKWPVYjUjiHjaDQE2M=
 script:
   - cargo build --verbose
   - cargo test --verbose
   - cargo bench --verbose
   - cargo doc --verbose
-after_script:
-  - mv target/doc doc
-  - curl http://www.rust-ci.org/artifacts/put?t=$RUSTCI_TOKEN | sh
+after_success: |
+  [ $TRAVIS_PULL_REQUEST = false ] &&
+  [ $TRAVIS_BRANCH = master ] &&
+  [ $(uname -s) = Linux ] &&
+  ./upload_docs
