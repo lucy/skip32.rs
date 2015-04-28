@@ -1,0 +1,11 @@
+[package]
+name = "skip32"
+version = "0.1.0"
+authors = ["lucy <ne.tetewi@gmail.com>"]
+description = "skip32 block cipher"
+license-file = "LICENSE"
+homepage = "https://github.com/lucy/skip32.rs"
+include = ["src/*.rs", "Cargo.toml"]
+
+[dev-dependencies]
+quickcheck = "*"
