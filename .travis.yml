@@ -6,7 +6,6 @@ env:
 script:
   - cargo build --verbose
   - cargo test --verbose
-  - cargo bench --verbose
   - cargo doc --verbose
 after_success: |
   [ $TRAVIS_PULL_REQUEST = false ] &&

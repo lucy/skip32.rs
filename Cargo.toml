@@ -2,9 +2,10 @@
 name = "skip32"
 version = "0.1.0"
 authors = ["lucy <ne.tetewi@gmail.com>"]
-description = "skip32 block cipher"
+description = "fast 32-bit block cipher, useful for unique IDs"
 license-file = "LICENSE"
-homepage = "https://github.com/lucy/skip32.rs"
+repository = "https://github.com/lucy/skip32.rs"
+documentation = "http://lucy.github.io/skip32.rs/skip32/"
 include = ["src/*.rs", "Cargo.toml"]
 
 [dev-dependencies]
