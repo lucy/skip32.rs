@@ -1,6 +1,6 @@
 [package]
 name = "skip32"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["lucy <ne.tetewi@gmail.com>"]
 description = "fast 32-bit block cipher, useful for unique IDs"
 license-file = "LICENSE"
