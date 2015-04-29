@@ -1,4 +1,7 @@
 language: rust
+branches:
+  except:
+    - gh-pages
 sudo: false
 env:
   global:
