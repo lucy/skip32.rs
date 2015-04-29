@@ -2,10 +2,11 @@
 set -e
 
 cd target/doc
+rev="$(git rev-parse --short HEAD)"
 git init
 git config user.name "travis"
 git config user.email "travis@ded.co"
 git remote add upstream "https://$GH_TOKEN@github.com/lucy/skip32.rs.git"
 git add -A .
-git commit -m "travis doc gen for $(git rev-parse --short HEAD)"
+git commit -m "travis doc gen for $rev"
 git push -f upstream HEAD:gh-pages
