@@ -22,6 +22,8 @@
 //! let decoded = skip32::decode(key, encoded);
 //! assert!(decoded == 1000);
 //! ```
+//!
+//! This crate is usable with `#![no_std]`
 
 #![feature(negate_unsigned, no_std, core)]
 #![cfg_attr(test, feature(test))]
@@ -30,10 +32,14 @@
 extern crate core;
 
 /// Encode value
-pub fn encode(key: &[u8; 10], x: u32) -> u32 { skip32(key, x,  0,  1) }
+pub fn encode(key: &[u8; 10], x: u32) -> u32 {
+    skip32(key, x, 0, 1)
+}
 
 /// Decode value
-pub fn decode(key: &[u8; 10], x: u32) -> u32 { skip32(key, x, 23, -1) }
+pub fn decode(key: &[u8; 10], x: u32) -> u32 {
+    skip32(key, x, 23, -1)
+}
 
 #[inline(always)]
 fn c16to8(x: u16) -> (u8, u8) {
@@ -109,13 +115,12 @@ mod std {
 
 #[cfg(test)]
 mod test {
+    extern crate quickcheck;
     extern crate std;
     extern crate test;
-    extern crate quickcheck;
 
-    use self::test::Bencher;
-    use self::test::black_box;
     use self::quickcheck::quickcheck;
+    use self::test::{Bencher, black_box};
 
     const KEY: &'static [u8; 10] = &[1,2,3,4,5,6,7,8,9,10];
 
@@ -132,7 +137,9 @@ mod test {
     #[test]
     fn prop_id() {
         // decode(key, encode(key, x)) == x
-        fn prop(x: u32) -> bool { ::decode(KEY, ::encode(KEY, x)) == x }
+        fn prop(x: u32) -> bool {
+            ::decode(KEY, ::encode(KEY, x)) == x
+        }
         quickcheck(prop as fn(u32) -> bool);
     }
 }
