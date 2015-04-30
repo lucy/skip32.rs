@@ -1,8 +1,10 @@
 #!/bin/sh
 set -e
-
-cd target/doc
+# get rev for commit msg
 rev="$(git rev-parse --short HEAD)"
+cd target/doc
+# redirect to skip32
+echo '<meta http-equiv=refresh content=0;url=skip32>' > index.html
 git init
 git config user.name "travis"
 git config user.email "travis@ded.co"
