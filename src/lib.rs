@@ -1,6 +1,3 @@
-#![feature(negate_unsigned)]
-#![cfg_attr(test, feature(test))]
-
 //! SKIP32 is a 80-bit key, 32-bit block cipher based on SKIPJACK.
 //!
 //! It has the uncommon properties of being fast, creating very dissimilar encrypted values for
@@ -25,6 +22,12 @@
 //! let decoded = skip32::decode(key, encoded);
 //! assert!(decoded == 1000);
 //! ```
+
+#![feature(negate_unsigned, no_std, core)]
+#![cfg_attr(test, feature(test))]
+#![no_std]
+
+extern crate core;
 
 /// Encode value
 pub fn encode(key: &[u8; 10], x: u32) -> u32 { skip32(key, x,  0,  1) }
@@ -99,7 +102,14 @@ fn skip32(key: &[u8; 10], buf: u32, mut k: u16, kstep: u16) -> u32 {
 }
 
 #[cfg(test)]
+mod std {
+    extern crate std;
+    pub use self::std::{env, os, slice};
+}
+
+#[cfg(test)]
 mod test {
+    extern crate std;
     extern crate test;
     extern crate quickcheck;
 
