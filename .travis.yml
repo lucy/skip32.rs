@@ -1,18 +1,29 @@
 language: rust
-rust: nightly
-branches:
-  except:
-    - gh-pages
+
+matrix:
+    fast_finish: true
+    include:
+        - rust: nightly
+        - rust: beta
+        - rust: stable
+
 sudo: false
-env:
-  global:
-    secure: KrSphUaXPC4Q4hcdnwViMzYmgJ7o5cNRMT7cpzGdjvrnMyEzYyQCd/rynWbajQLywanaEe6iafq4dtQVmK0LSMXXRw4qLpp9NNTn2l1o8qz2QhDMy2gDxzZyOCI0aZJadcFcvpH2OgQ5ui76AVXAHln8IaKWPVYjUjiHjaDQE2M=
+
 script:
-  - cargo build --verbose
-  - cargo test --verbose
-  - cargo doc --verbose
+    - cargo build --verbose
+    - cargo test --verbose
+    - 'if [ "$TRAVIS_RUST_VERSION" = nightly ]; then cargo bench --no-run; fi'
+
 after_success: |
-  [ $TRAVIS_PULL_REQUEST = false ] &&
-  [ $TRAVIS_BRANCH = master ] &&
-  [ $(uname -s) = Linux ] &&
-  ./.upload_docs
+    [ $TRAVIS_BRANCH = master ] &&
+    [ $TRAVIS_PULL_REQUEST = false ] &&
+    [ $TRAVIS_RUST_VERSION = stable ] &&
+    cargo doc &&
+    echo '<meta http-equiv=refresh content=0;url=skip32>' > target/doc/index.html &&
+    pip install --user ghp-import &&
+    /home/travis/.local/bin/ghp-import -n target/doc &&
+    git push -fq "https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git" gh-pages
+
+env:
+    global:
+        secure: KrSphUaXPC4Q4hcdnwViMzYmgJ7o5cNRMT7cpzGdjvrnMyEzYyQCd/rynWbajQLywanaEe6iafq4dtQVmK0LSMXXRw4qLpp9NNTn2l1o8qz2QhDMy2gDxzZyOCI0aZJadcFcvpH2OgQ5ui76AVXAHln8IaKWPVYjUjiHjaDQE2M=
