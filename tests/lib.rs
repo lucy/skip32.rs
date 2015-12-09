@@ -1,10 +1,6 @@
 extern crate skip32;
 extern crate quickcheck;
 
-use self::quickcheck::quickcheck;
-
-const KEY: &'static [u8; 10] = &[0,0,0,0,0,0,0,0,0,0];
-
 static KEYS: &'static [&'static [u8; 10]] = &[
     b"\x42\x08\x81\xdf\xbe\xcf\x2f\x33\xb3\xdd",
     b"\x28\xf2\x4e\x89\x63\x92\x29\xdd\xfe\x74",
@@ -25,17 +21,35 @@ static VALUES: &'static [&'static [u32]] = &[
 fn predef() {
     for x in 0..5 {
         for y in 0..10 {
-            assert!(skip32::encode(KEYS[x], KEYS[x][y] as u32) == VALUES[x][y]);
-            assert!(KEYS[x][y] as u32 == skip32::decode(KEYS[x], VALUES[x][y]));
+            let enc = skip32::encode(KEYS[x], KEYS[x][y] as u32);
+            let dec = skip32::decode(KEYS[x], VALUES[x][y]);
+            assert!(enc == VALUES[x][y]);
+            assert!(dec == KEYS[x][y] as u32);
+        }
+    }
+}
+
+use quickcheck::quickcheck;
+use quickcheck::Arbitrary;
+use quickcheck::Gen;
+
+#[derive(Copy, Clone, Debug)]
+struct X10<T: Copy>{ a: [T; 10] }
+
+impl<A: Arbitrary + Clone + Copy> Arbitrary for X10<A> {
+    fn arbitrary<G: Gen>(g: &mut G) -> Self {
+        unsafe {
+            let mut x: X10<A> = X10 { a: std::mem::uninitialized() };
+            for x in &mut x.a { *x = A::arbitrary(g); }
+            x
         }
     }
 }
 
 #[test]
 fn prop_id() {
-    // decode(key, encode(key, x)) == x
-    fn prop(x: u32) -> bool {
-        skip32::decode(KEY, skip32::encode(KEY, x)) == x
+    fn prop(k: X10<u8>, x: u32) -> bool {
+        skip32::decode(&k.a, skip32::encode(&k.a, x)) == x
     }
-    quickcheck(prop as fn(u32) -> bool);
+    quickcheck(prop as fn(X10<u8>, u32) -> bool);
 }
