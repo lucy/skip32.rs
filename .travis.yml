@@ -11,25 +11,16 @@ before_script:
   - pip install 'travis-cargo<0.2' --user && export PATH=$HOME/.local/bin:$PATH
 
 script:
-  - cargo build --verbose
-  - cargo build --verbose --no-default-features
-  - cargo test --verbose
-  - 'if [ "$TRAVIS_RUST_VERSION" = nightly ]; then cargo bench --no-run; fi'
-  - cargo doc --no-deps
+  - travis-cargo build
+  - travis-cargo test
+  - travis--cargo bench
+  - travis-cargo doc --no-deps
 
 after_success:
   - travis-cargo --only nightly doc-upload
-  - travis-cargo coveralls --no-sudo
 
 env:
   global:
     # don't pass --feature unstable to nightly
     - TRAVIS_CARGO_NIGHTLY_FEATURE=
     secure: KrSphUaXPC4Q4hcdnwViMzYmgJ7o5cNRMT7cpzGdjvrnMyEzYyQCd/rynWbajQLywanaEe6iafq4dtQVmK0LSMXXRw4qLpp9NNTn2l1o8qz2QhDMy2gDxzZyOCI0aZJadcFcvpH2OgQ5ui76AVXAHln8IaKWPVYjUjiHjaDQE2M=
-
-addons:
-  apt:
-    packages:
-      - libcurl4-openssl-dev
-      - libelf-dev
-      - libdw-dev
