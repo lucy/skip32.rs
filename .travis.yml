@@ -7,20 +7,20 @@ rust:
 
 sudo: false
 
-before_script:
-  - pip install 'travis-cargo<0.2' --user && export PATH=$HOME/.local/bin:$PATH
+before_script: |
+  pip install 'travis-cargo<0.2' --user &&
+    export PATH=$HOME/.local/bin:$PATH
 
 script:
   - travis-cargo build
   - travis-cargo test
-  - travis--cargo bench
-  - travis-cargo doc --no-deps
+  - travis-cargo bench
+  - travis-cargo doc
 
 after_success:
   - travis-cargo --only nightly doc-upload
 
 env:
   global:
-    # don't pass --feature unstable to nightly
-    - TRAVIS_CARGO_NIGHTLY_FEATURE=
-    secure: KrSphUaXPC4Q4hcdnwViMzYmgJ7o5cNRMT7cpzGdjvrnMyEzYyQCd/rynWbajQLywanaEe6iafq4dtQVmK0LSMXXRw4qLpp9NNTn2l1o8qz2QhDMy2gDxzZyOCI0aZJadcFcvpH2OgQ5ui76AVXAHln8IaKWPVYjUjiHjaDQE2M=
+    - TRAVIS_CARGO_NIGHTLY_FEATURE=""
+    - secure: KrSphUaXPC4Q4hcdnwViMzYmgJ7o5cNRMT7cpzGdjvrnMyEzYyQCd/rynWbajQLywanaEe6iafq4dtQVmK0LSMXXRw4qLpp9NNTn2l1o8qz2QhDMy2gDxzZyOCI0aZJadcFcvpH2OgQ5ui76AVXAHln8IaKWPVYjUjiHjaDQE2M=
