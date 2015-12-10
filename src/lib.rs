@@ -1,14 +1,16 @@
 //! SKIP32 is a 80-bit key, 32-bit block cipher based on SKIPJACK.
 //!
-//! It has the uncommon properties of being fast, creating very dissimilar encrypted values for
-//! consecutive input values, and producing output of the same size as the input (32-bit). These
-//! make this cipher particularly useful for obfuscating series of 32-bit integers (e.g.
-//! auto-incremented database ids). It is not appropriate for general cryptography.
+//! It has the uncommon properties of being fast, creating very dissimilar
+//! encrypted values for consecutive input values, and producing output of the
+//! same size as the input (32-bit). These make this cipher particularly useful
+//! for obfuscating series of 32-bit integers (e.g.  auto-incremented database
+//! ids). It is not appropriate for general cryptography.
 //!
 //! [CPAN - Crypt::Skip32](http://search.cpan.org/%7Eesh/Crypt-Skip32-0.17/lib/Crypt/Skip32.pm)
 //! has more information.
 //!
-//! A copy of the original source code that this is based on can be found in `skip32.c`.
+//! A copy of the original source code that this is based on can be found in
+//! `skip32.c`.
 //!
 //! # Example
 //!
@@ -23,12 +25,12 @@
 //! assert!(decoded == 1000);
 //! ```
 
-/// Encode x using key
+/// Encode value
 pub fn encode(key: &[u8; 10], x: u32) -> u32 {
     skip32(key, x, 0, 1)
 }
 
-/// Decode x using key
+/// Decode value
 pub fn decode(key: &[u8; 10], x: u32) -> u32 {
     skip32(key, x, 23, !0)
 }
@@ -54,28 +56,28 @@ const TABLE: [u8; 256] = [
 
 #[inline(always)]
 fn g(key: &[u8; 10], w: u16, k: usize) -> u16 {
-    let g1: u8 = (w>>8) as u8;
+    let g1: u8 = (w >> 8) as u8;
     let g2: u8 = w as u8;
-    let g3: u8 = TABLE[(g2^key[(4*k+0)%10]) as usize]^g1;
-    let g4: u8 = TABLE[(g3^key[(4*k+1)%10]) as usize]^g2;
-    let g5: u8 = TABLE[(g4^key[(4*k+2)%10]) as usize]^g3;
-    let g6: u8 = TABLE[(g5^key[(4*k+3)%10]) as usize]^g4;
-    (g5 as u16)<<8 | g6 as u16
+    let g3: u8 = TABLE[(g2 ^ key[(4 * k + 0) % 10]) as usize] ^ g1;
+    let g4: u8 = TABLE[(g3 ^ key[(4 * k + 1) % 10]) as usize] ^ g2;
+    let g5: u8 = TABLE[(g4 ^ key[(4 * k + 2) % 10]) as usize] ^ g3;
+    let g6: u8 = TABLE[(g5 ^ key[(4 * k + 3) % 10]) as usize] ^ g4;
+    (g5 as u16) << 8 | g6 as u16
 }
 
 #[inline]
 fn skip32(key: &[u8; 10], x: u32, mut k: usize, kstep: usize) -> u32 {
     // Unpack
-    let mut wl = (x>>16) as u16;
+    let mut wl = (x >> 16) as u16;
     let mut wr = x as u16;
 
     for _ in 0..12 {
-        wr ^= g(key, wl, k)^(k as u16);
+        wr ^= g(key, wl, k) ^ (k as u16);
         k = k.wrapping_add(kstep);
-        wl ^= g(key, wr, k)^(k as u16);
+        wl ^= g(key, wr, k) ^ (k as u16);
         k = k.wrapping_add(kstep);
     }
 
     // Swap halves
-    (wr as u32)<<16 | wl as u32
+    (wr as u32) << 16 | wl as u32
 }
