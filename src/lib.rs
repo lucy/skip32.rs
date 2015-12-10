@@ -25,17 +25,7 @@
 //! assert!(decoded == 1000);
 //! ```
 
-/// Encode value
-pub fn encode(key: &[u8; 10], x: u32) -> u32 {
-    skip32(key, x, 0, 1)
-}
-
-/// Decode value
-pub fn decode(key: &[u8; 10], x: u32) -> u32 {
-    skip32(key, x, 23, !0)
-}
-
-const TABLE: [u8; 256] = [
+static TABLE: &'static [u8; 256] = &[
     0xa3, 0xd7, 0x09, 0x83, 0xf8, 0x48, 0xf6, 0xf4, 0xb3, 0x21, 0x15, 0x78, 0x99, 0xb1, 0xaf, 0xf9,
     0xe7, 0x2d, 0x4d, 0x8a, 0xce, 0x4c, 0xca, 0x2e, 0x52, 0x95, 0xd9, 0x1e, 0x4e, 0x38, 0x44, 0x28,
     0x0a, 0xdf, 0x02, 0xa0, 0x17, 0xf1, 0x60, 0x68, 0x12, 0xb7, 0x7a, 0xc3, 0xe9, 0xfa, 0x3d, 0x53,
@@ -54,23 +44,22 @@ const TABLE: [u8; 256] = [
     0x5e, 0x6c, 0xa9, 0x13, 0x57, 0x25, 0xb5, 0xe3, 0xbd, 0xa8, 0x3a, 0x01, 0x05, 0x59, 0x2a, 0x46,
 ];
 
-#[inline(always)]
 fn g(key: &[u8; 10], w: u16, k: usize) -> u16 {
     let g1: u8 = (w >> 8) as u8;
     let g2: u8 = w as u8;
-    let g3: u8 = TABLE[(g2 ^ key[(4 * k + 0) % 10]) as usize] ^ g1;
-    let g4: u8 = TABLE[(g3 ^ key[(4 * k + 1) % 10]) as usize] ^ g2;
-    let g5: u8 = TABLE[(g4 ^ key[(4 * k + 2) % 10]) as usize] ^ g3;
-    let g6: u8 = TABLE[(g5 ^ key[(4 * k + 3) % 10]) as usize] ^ g4;
+    let g3: u8 = TABLE[(g2 ^ key[(4*k+0)%10]) as usize] ^ g1;
+    let g4: u8 = TABLE[(g3 ^ key[(4*k+1)%10]) as usize] ^ g2;
+    let g5: u8 = TABLE[(g4 ^ key[(4*k+2)%10]) as usize] ^ g3;
+    let g6: u8 = TABLE[(g5 ^ key[(4*k+3)%10]) as usize] ^ g4;
     (g5 as u16) << 8 | g6 as u16
 }
 
-#[inline]
 fn skip32(key: &[u8; 10], x: u32, mut k: usize, kstep: usize) -> u32 {
     // Unpack
     let mut wl = (x >> 16) as u16;
     let mut wr = x as u16;
 
+    // 24 feistel rounds, doubled up
     for _ in 0..12 {
         wr ^= g(key, wl, k) ^ (k as u16);
         k = k.wrapping_add(kstep);
@@ -80,4 +69,14 @@ fn skip32(key: &[u8; 10], x: u32, mut k: usize, kstep: usize) -> u32 {
 
     // Swap halves
     (wr as u32) << 16 | wl as u32
+}
+
+/// Encode value
+pub fn encode(key: &[u8; 10], x: u32) -> u32 {
+    skip32(key, x, 0, 1)
+}
+
+/// Decode value
+pub fn decode(key: &[u8; 10], x: u32) -> u32 {
+    skip32(key, x, 23, !0)
 }
