@@ -34,22 +34,20 @@ use quickcheck::Arbitrary;
 use quickcheck::Gen;
 
 #[derive(Copy, Clone, Debug)]
-struct X10<T: Copy>{ a: [T; 10] }
+struct Key { a: [u8; 10] }
 
-impl<A: Arbitrary + Clone + Copy> Arbitrary for X10<A> {
+impl Arbitrary for Key {
     fn arbitrary<G: Gen>(g: &mut G) -> Self {
-        unsafe {
-            let mut x: X10<A> = X10 { a: std::mem::uninitialized() };
-            for x in &mut x.a { *x = A::arbitrary(g); }
-            x
-        }
+        let mut x = Key { a: [0; 10] };
+        for x in &mut x.a { *x = Arbitrary::arbitrary(g); }
+        x
     }
 }
 
 #[test]
 fn prop_id() {
-    fn prop(k: X10<u8>, x: u32) -> bool {
+    fn prop(k: Key, x: u32) -> bool {
         skip32::decode(&k.a, skip32::encode(&k.a, x)) == x
     }
-    quickcheck(prop as fn(X10<u8>, u32) -> bool);
+    quickcheck(prop as fn(Key, u32) -> bool);
 }

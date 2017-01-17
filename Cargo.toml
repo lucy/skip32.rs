@@ -9,4 +9,4 @@ documentation = "http://lucy.github.io/skip32.rs/skip32/"
 include = ["src/*.rs", "Cargo.toml"]
 
 [dev-dependencies]
-quickcheck = "0.2"
+quickcheck = "0.4"
