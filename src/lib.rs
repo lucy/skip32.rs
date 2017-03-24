@@ -7,22 +7,17 @@
 //! ids). It is not appropriate for general cryptography.
 //!
 //! [CPAN - Crypt::Skip32](http://search.cpan.org/%7Eesh/Crypt-Skip32-0.17/lib/Crypt/Skip32.pm)
-//! has more information.
-//!
-//! A copy of the original source code that this is based on can be found in
-//! `skip32.c`.
+//! for more information.
 //!
 //! # Example
 //!
 //! ```
-//! // keys are plain byte arrays
 //! let key: &[u8; 10] = &[1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-//! // input and output blocks are u32
-//! let encoded: u32 = skip32::encode(key, 1000);
-//! // every input has a unique output
-//! assert!(encoded == 2109307140);
+//! let input = 1000;
+//! let encoded = skip32::encode(key, input);
 //! let decoded = skip32::decode(key, encoded);
-//! assert!(decoded == 1000);
+//! assert!(encoded == 2109307140);
+//! assert!(decoded == input);
 //! ```
 
 static TABLE: &'static [u8; 256] = &[
@@ -45,38 +40,27 @@ static TABLE: &'static [u8; 256] = &[
 ];
 
 fn g(key: &[u8; 10], w: u16, k: usize) -> u16 {
-    let g1: u8 = (w >> 8) as u8;
-    let g2: u8 = w as u8;
-    let g3: u8 = TABLE[(g2 ^ key[(4*k+0)%10]) as usize] ^ g1;
-    let g4: u8 = TABLE[(g3 ^ key[(4*k+1)%10]) as usize] ^ g2;
-    let g5: u8 = TABLE[(g4 ^ key[(4*k+2)%10]) as usize] ^ g3;
-    let g6: u8 = TABLE[(g5 ^ key[(4*k+3)%10]) as usize] ^ g4;
-    (g5 as u16) << 8 | g6 as u16
+    let (g1, g2) = ((w >> 8) as u8, w as u8);
+    let g3 = TABLE[(g2 ^ key[(4 * k + 0) % 10]) as usize] ^ g1;
+    let g4 = TABLE[(g3 ^ key[(4 * k + 1) % 10]) as usize] ^ g2;
+    let g5 = TABLE[(g4 ^ key[(4 * k + 2) % 10]) as usize] ^ g3;
+    let g6 = TABLE[(g5 ^ key[(4 * k + 3) % 10]) as usize] ^ g4;
+    ((g5 as u16) << 8 | g6 as u16) ^ k as u16
 }
 
 fn skip32(key: &[u8; 10], x: u32, mut k: usize, kstep: usize) -> u32 {
-    // Unpack
-    let mut wl = (x >> 16) as u16;
-    let mut wr = x as u16;
-
-    // 24 feistel rounds, doubled up
+    let (mut wl, mut wr) = ((x >> 16) as u16, x as u16);
     for _ in 0..12 {
-        wr ^= g(key, wl, k) ^ (k as u16);
+        wr ^= g(key, wl, k);
         k = k.wrapping_add(kstep);
-        wl ^= g(key, wr, k) ^ (k as u16);
+        wl ^= g(key, wr, k);
         k = k.wrapping_add(kstep);
     }
-
-    // Swap halves
     (wr as u32) << 16 | wl as u32
 }
 
-/// Encode value
-pub fn encode(key: &[u8; 10], x: u32) -> u32 {
-    skip32(key, x, 0, 1)
-}
+/// Encode
+pub fn encode(key: &[u8; 10], x: u32) -> u32 { skip32(key, x, 0, 1) }
 
-/// Decode value
-pub fn decode(key: &[u8; 10], x: u32) -> u32 {
-    skip32(key, x, 23, !0)
-}
+/// Decode
+pub fn decode(key: &[u8; 10], x: u32) -> u32 { skip32(key, x, 23, !0) }

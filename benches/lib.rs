@@ -5,7 +5,7 @@ extern crate skip32;
 
 use test::{Bencher, black_box};
 
-const KEY: &'static [u8; 10] = &[0,0,0,0,0,0,0,0,0,0];
+const KEY: &'static [u8; 10] = &[1,2,3,4,5,6,7,8,9,10];
 
 #[bench]
 fn bench_encode(b: &mut Bencher) {
