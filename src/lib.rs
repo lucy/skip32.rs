@@ -59,12 +59,12 @@ fn skip32(key: &[u8; 10], x: u32, mut k: usize, kstep: usize) -> u32 {
     (wr as u32) << 16 | wl as u32
 }
 
-/// Encode
+/// Encode a `u32` using the given key
 pub fn encode(key: &[u8; 10], x: u32) -> u32 {
     skip32(key, x, 0, 1)
 }
 
-/// Decode
+/// Decode an encoded `u32` using the given key
 pub fn decode(key: &[u8; 10], x: u32) -> u32 {
     skip32(key, x, 23, !0)
 }
