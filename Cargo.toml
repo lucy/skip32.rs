@@ -1,12 +1,12 @@
 [package]
-name = "skip32"
-version = "1.0.4"
-authors = ["lucy <ne.tetewi@gmail.com>"]
-description = "fast 32-bit block cipher, useful for unique IDs"
-license-file = "LICENSE"
-repository = "https://github.com/lucy/skip32.rs"
+authors = ["lucy <lucy@luz.lu>"]
+description = "Fast 32-bit block cipher"
 documentation = "https://docs.rs/skip32"
 include = ["src/*.rs", "Cargo.toml"]
+license = "MIT"
+name = "skip32"
+repository = "https://github.com/lucy/skip32.rs"
+version = "1.0.5"
 
 [dev-dependencies]
-quickcheck = "0.4.1"
+quickcheck = "0.9.0"

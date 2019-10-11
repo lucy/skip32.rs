@@ -6,7 +6,7 @@
 //! for obfuscating series of 32-bit integers (e.g.  auto-incremented database
 //! ids). It is not appropriate for general cryptography.
 //!
-//! [CPAN - Crypt::Skip32](http://search.cpan.org/%7Eesh/Crypt-Skip32-0.17/lib/Crypt/Skip32.pm)
+//! See [CPAN - Crypt::Skip32](http://search.cpan.org/%7Eesh/Crypt-Skip32-0.17/lib/Crypt/Skip32.pm)
 //! for more information.
 //!
 //! # Example
